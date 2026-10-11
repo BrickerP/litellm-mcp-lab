@@ -31,6 +31,11 @@ jobs:
       - name: docker compose config (optional)
         run: |
           if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+            # compose.yml requires env_file .env and interpolates LITELLM_MASTER_KEY.
+            # Runners have no secrets; .env.example is placeholders only (gitignored .env).
+            if [ ! -f .env ] && [ -f .env.example ]; then
+              cp .env.example .env
+            fi
             docker compose -f compose.yml config --quiet
             echo "docker compose config: OK"
           else
