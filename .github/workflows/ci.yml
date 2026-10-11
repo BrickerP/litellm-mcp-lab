@@ -1,0 +1,38 @@
+# Cheap lab checks — not a production gate.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Python syntax (mcp_servers)
+        run: python -m py_compile mcp_servers/*.py
+
+      - name: Parse compose.yml (PyYAML)
+        run: |
+          pip install --quiet pyyaml
+          python -c "import yaml, pathlib; yaml.safe_load(pathlib.Path('compose.yml').read_text()); print('compose.yml: OK')"
+
+      - name: docker compose config (optional)
+        run: |
+          if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+            docker compose -f compose.yml config --quiet
+            echo "docker compose config: OK"
+          else
+            echo "docker compose not available — skipped"
+          fi
