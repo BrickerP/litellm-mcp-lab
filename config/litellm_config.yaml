@@ -1,0 +1,26 @@
+# Minimal LiteLLM proxy config for local lab use.
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+#
+# Models below assume OPENAI_API_KEY is set in the environment.
+# Swap or add providers as needed — keep this file free of secrets.
+
+model_list:
+  - model_name: gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      # api_key pulled from OPENAI_API_KEY env
+
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+
+general_settings:
+  # Master key comes from LITELLM_MASTER_KEY env (see .env.example).
+  # Virtual keys (budgeted) are created via UI/API after first boot —
+  # see README "Budgeted virtual key".
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+litellm_settings:
+  # Lab defaults: drop noisy telemetry, keep spend tracking on when DB is present.
+  drop_params: true
+  set_verbose: false
